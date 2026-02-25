@@ -14,12 +14,25 @@ body {
   transition: background 1.5s ease;
 }
 
-/* Yıldızlar */
+/* Uzay Objeleri (Yıldızlar ve Gezegenler) */
+.space-obj {
+  position: absolute; border-radius: 50%; z-index: 0;
+  transition: opacity 2s ease; /* Kaybolma efekti için */
+}
 .star {
-  position: absolute; background: white; border-radius: 50%; z-index: 0;
+  background: white;
   box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
   animation: twinkle var(--duration) infinite alternate;
 }
+.planet {
+  box-shadow: inset -10px -10px 20px rgba(0,0,0,0.8);
+}
+/* Venüs için özel parlaklık */
+.venus {
+  background: radial-gradient(circle at 30% 30%, #e3bb76, #a57e3e);
+  box-shadow: 0 0 20px 5px rgba(227, 187, 118, 0.4);
+}
+
 @keyframes twinkle {
   from { opacity: 0.4; transform: scale(0.8); }
   to { opacity: 1; transform: scale(1.2); }
@@ -120,17 +133,48 @@ button:hover { background: #fff; color: #000; }
 <audio id="music" src="music.mp3" loop></audio>
 
 <script>
-// Yıldızlar
-const starsCount = 130;
-for(let i=0; i<starsCount; i++){
-  let s = document.createElement('div');
-  s.className = 'star';
-  s.style.top = Math.random() * 100 + '%';
-  s.style.left = Math.random() * 100 + '%';
-  let size = Math.random() * 2 + 2.5; 
-  s.style.width = size + 'px'; s.style.height = size + 'px';
-  s.style.setProperty('--duration', (Math.random() * 3 + 1) + 's');
-  document.body.appendChild(s);
+// Uzay Elemanlarını Başlat (Yıldızlar + Venüs + Gezegenler)
+const generateSpace = () => {
+  const starsCount = 130;
+  for(let i=0; i<starsCount; i++){
+    let s = document.createElement('div');
+    s.className = 'space-obj star';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.left = Math.random() * 100 + '%';
+    let size = Math.random() * 2 + 2.5; 
+    s.style.width = size + 'px'; s.style.height = size + 'px';
+    s.style.setProperty('--duration', (Math.random() * 3 + 1) + 's');
+    document.body.appendChild(s);
+  }
+
+  // Venüs'ü ekle
+  let venus = document.createElement('div');
+  venus.className = 'space-obj planet venus';
+  venus.style.top = '15%'; venus.style.right = '20%';
+  venus.style.width = '40px'; venus.style.height = '40px';
+  document.body.appendChild(venus);
+
+  // Birkaç küçük uzak gezegen
+  for(let j=0; j<3; j++) {
+    let p = document.createElement('div');
+    p.className = 'space-obj planet';
+    p.style.background = `hsl(${Math.random()*360}, 30%, 50%)`;
+    p.style.width = (Math.random()*15 + 10) + 'px';
+    p.style.height = p.style.width;
+    p.style.top = Math.random() * 80 + '%';
+    p.style.left = Math.random() * 80 + '%';
+    document.body.appendChild(p);
+  }
+}
+generateSpace();
+
+// Uzay objelerini yok eden fonksiyon
+function clearSpace() {
+  const objects = document.querySelectorAll('.space-obj');
+  objects.forEach(obj => { obj.style.opacity = '0'; });
+  setTimeout(() => {
+    objects.forEach(obj => obj.remove());
+  }, 2000);
 }
 
 function answer(isYes){
@@ -154,6 +198,9 @@ function answer(isYes){
 }
 
 function showCake(){
+  // PASTA AŞAMASINDA YILDIZLAR GİTSİN
+  clearSpace(); 
+  
   const content = document.getElementById('content');
   content.innerHTML = `
     <div class="cake fade">
@@ -285,7 +332,6 @@ function passBeauty() {
 
 function checkSong() {
   if (document.getElementById('song-input').value.toLowerCase().includes("luther")) { 
-    // BURASI GÜNCELLENDİ: ÖNCE HACKER TEMASINA DÖNÜŞ
     returnToHacker(); 
   }
   else { document.getElementById('song-error').innerText = "> WRONG KEY. ACCESS DENIED."; }
@@ -293,7 +339,6 @@ function checkSong() {
 
 function returnToHacker() {
   const screen = document.getElementById('final-screen');
-  // Alevleri kapat, cehennem temasını sil, hacker kanvasını göster
   document.getElementById('fire-bg').style.display = "none";
   document.body.classList.remove('hell-bg');
   document.body.style.background = "black";
@@ -316,14 +361,12 @@ function returnToHacker() {
     }
     else { 
       clearInterval(interval); 
-      // SİSTEMDEN ÇIKILDI, ŞİMDİ BEYAZ VE SANDIK SAHNESİ
       setTimeout(revealChest, 2500); 
     }
   }, 1000);
 }
 
 function revealChest() {
-  // EKRAN BEYAZ OLUYOR
   document.body.style.background = "#fff";
   document.getElementById('hacker-canvas').style.display = "none";
   
